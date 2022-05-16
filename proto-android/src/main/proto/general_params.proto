@@ -1,0 +1,22 @@
+//使用proto3语法
+syntax = "proto3";
+option java_package = "com.androidx.ulife.model";
+
+// 通用数据
+message GeneralParams {
+  string deviceId = 1;
+  string sysId = 2;
+  string gaid = 3;
+  string countryCode = 4;
+  string language = 5;
+  string iccid1 = 6;
+  string iccid2 = 7;
+  string chId = 8;
+  string os = 9;
+  string appVersion = 10;
+  string networkType = 11;
+  string model = 12;
+  string brand = 13;
+  string manufacturer = 14;
+  string mccMnc = 15;
+}

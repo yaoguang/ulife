@@ -1,0 +1,28 @@
+//使用proto3语法
+syntax = "proto3";
+
+import "ulife_req.proto";
+import "ulife_resp.proto";
+
+//指定proto文件生成java文件后的类名
+option java_package = "com.androidx.ulife.model";
+
+//开启多文件
+option java_multiple_files = true;
+
+//定义rpc服务接口
+// 查询ulife数据
+service UlifeService {
+  //查询Ulife区接口方法
+  rpc QueryUlife(QueryRequest) returns (stream QueryResponse){
+
+  }
+}
+
+
+
+
+
+
+
+
