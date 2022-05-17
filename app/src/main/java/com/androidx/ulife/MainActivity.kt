@@ -1,20 +1,26 @@
 package com.androidx.ulife
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
+import com.androidx.ulife.dao.AppDatabase
+import com.androidx.ulife.dao.HomePagePart
 import com.androidx.ulife.databinding.ActivityMainBinding
-import com.androidx.ulife.model.*
-import com.blankj.utilcode.util.ToastUtils
-import io.grpc.ManagedChannelBuilder
-import kotlinx.coroutines.*
+import com.androidx.ulife.model.HomePagePartForm
+import com.androidx.ulife.model.RefreshMode
+import com.androidx.ulife.model.adPicItem
+import com.blankj.utilcode.util.LogUtils
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
+
+        val homePageDao = AppDatabase.appDb.homePageDao()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -38,6 +46,26 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAnchorView(R.id.fab)
                 .setAction("Action", null).show()
+
+            GlobalScope.launch(Dispatchers.IO) {
+                val localList = arrayListOf(
+                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData()),
+                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_CREATE.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData()),
+                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_NEXT.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData()),
+                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData())
+                )
+                homePageDao.insert(localList)
+
+                LogUtils.d("Part Info", homePageDao.queryPart(Random.nextInt(5)))
+
+//                val partReq = homePageDao.queryPartReq(3)
+//                delay(5000)
+//                partReq?.let {
+//                    it.updateTime = System.currentTimeMillis()
+//                    it.version += 10
+//                    homePageDao.updateReqPart(it)
+//                }
+            }
         }
 
 //        GlobalScope.launch(Dispatchers.Main) {
@@ -80,5 +108,12 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    private fun randomData(): ByteArray {
+        return adPicItem {
+            picUrl = "啊7777${Random.nextInt()}"
+            clickAction = "我8888${Random.nextInt()}"
+        }.toByteArray()
     }
 }

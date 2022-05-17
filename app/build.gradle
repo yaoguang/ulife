@@ -68,10 +68,12 @@ dependencies {
 
     def room_version = "2.4.2"
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     api project(':proto-android')
     runtimeOnly("io.grpc:grpc-okhttp:${rootProject.ext["grpcVersion"]}")
+
+    api 'io.github.idisfkj:android-startup:1.0.7'
 
 //    // 基础依赖包，必须要依赖
 //    implementation 'com.geyifeng.immersionbar:immersionbar:3.2.1'

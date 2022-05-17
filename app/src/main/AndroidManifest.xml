@@ -26,6 +26,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="com.rousetime.android_startup.provider.StartupProvider"
+            android:authorities="${applicationId}.android_startup"
+            android:exported="false">
+            <meta-data
+                android:name="com.androidx.ulife.utlis.SampleStartupProviderConfig"
+                android:value="android.startup.provider.config" />
+            <meta-data
+                android:name="com.androidx.ulife.utlis.UtilsSdkInitializer"
+                android:value="android.startup" />
+            <meta-data
+                android:name="com.androidx.ulife.utlis.RoomSdkInitializer"
+                android:value="android.startup" />
+            <meta-data
+                android:name="com.androidx.ulife.utlis.GlobalDataInitializer"
+                android:value="android.startup" />
+        </provider>
+
+        <provider
+            android:name="com.blankj.utilcode.util.UtilsFileProvider"
+            android:authorities="${applicationId}.utilcode.fileprovider"
+            tools:node="remove" />
+
     </application>
 
 </manifest>
