@@ -54,13 +54,16 @@ dependencies {
 //    implementation 'com.qmuiteam:qmui:2.0.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
 //    implementation 'com.alibaba:fastjson:1.2.76'
-//    implementation "com.google.code.gson:gson:2.8.9"
+    implementation "com.google.code.gson:gson:2.8.9"
     implementation 'com.blankj:utilcodex:1.31.0'
 //    implementation 'com.tencent:mmkv-static:1.2.10'
     implementation 'com.guolindev.permissionx:permissionx:1.6.1'
 
-    implementation 'com.squareup.moshi:moshi:1.9.2'
-    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+//    implementation 'com.squareup.moshi:moshi:1.9.2'
+//    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
 
     implementation 'pub.devrel:easypermissions:3.0.0'
 

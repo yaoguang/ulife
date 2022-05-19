@@ -1,4 +1,4 @@
-package com.androidx.ulife.utlis
+package com.androidx.ulife.init
 
 import android.content.Context
 import com.androidx.ulife.dao.AppDatabase

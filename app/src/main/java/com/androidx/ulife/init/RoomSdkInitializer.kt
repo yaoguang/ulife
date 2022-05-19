@@ -1,4 +1,4 @@
-package com.androidx.ulife.utlis
+package com.androidx.ulife.init
 
 import android.app.Application
 import android.content.Context

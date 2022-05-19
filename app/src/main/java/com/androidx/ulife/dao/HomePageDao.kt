@@ -1,15 +1,18 @@
 package com.androidx.ulife.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface HomePageDao {
     @Insert
     fun insert(parts: List<HomePagePart>)
 
-    //    @Delete
-    //    fun delete(part: HomePagePart)
+    @Insert
+    fun insert(part: HomePagePart)
 
     @Update(entity = HomePagePart::class)
     fun updateReqPart(part: HomePagePartRequest)
@@ -23,8 +26,11 @@ interface HomePageDao {
     @Query("select id,part_type,version,update_time from home_page_part where part_type=:partType order by -version,-update_time limit 1")
     fun queryPartReq(partType: Int): HomePagePartRequest?
 
-    @Query("select id,part_type,version,update_time from (select * from home_page_part order by -version,-update_time) group by part_type")
+    @Query("select id,part_type,version,update_time from (select id,part_type,version,update_time from home_page_part order by -version,-update_time) group by part_type")
     fun queryPartReqList(): List<HomePagePartRequest>
+
+    @Query("select id,part_type,version,update_time from (select id,part_type,version,update_time from home_page_part where part_type in(:partTypes) order by -version,-update_time) group by part_type")
+    fun queryPartReqList(partTypes: List<Int>): List<HomePagePartRequest>
 
     @Query("delete from home_page_part where id not in (select id from (select id,part_type from home_page_part order by -version,-update_time) group by part_type)")
     fun clearOldParts(): Int

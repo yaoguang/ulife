@@ -7,14 +7,23 @@ option java_outer_classname = "UlifeReq";
 /*********ulife begin***********/
 //不同的数据区
 message QueryPart{
-    int32 version = 1;
-    int64 updateTime = 2;
-    int32 partType = 3;
+  int32 version = 1;
+  int64 updateTime = 2;
+  int32 partType = 3;
+  optional QueryUssdPart imsi1 = 4;
+  optional QueryUssdPart imsi2 = 5;
+}
+
+message QueryUssdPart{
+  int32 version = 1;
+  int64 updateTime = 2;
+  int32 mcc = 3;
+  int32 mnc = 4;
 }
 
 // 请求参数
 message QueryRequest{
-    GeneralParams general = 1;
-    repeated QueryPart  partition = 2;
+  GeneralParams general = 1;
+  repeated QueryPart  partition = 2;
 }
 /*********ulife end***********/

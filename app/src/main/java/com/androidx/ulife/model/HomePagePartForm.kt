@@ -1,5 +1,5 @@
 package com.androidx.ulife.model
 
 enum class HomePagePartForm {
-    GLOBAL, MCC, NET
+    GLOBAL, NET
 }

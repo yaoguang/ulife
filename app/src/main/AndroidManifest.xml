@@ -32,16 +32,19 @@
             android:authorities="${applicationId}.android_startup"
             android:exported="false">
             <meta-data
-                android:name="com.androidx.ulife.utlis.SampleStartupProviderConfig"
+                android:name="com.androidx.ulife.init.SampleStartupProviderConfig"
                 android:value="android.startup.provider.config" />
             <meta-data
-                android:name="com.androidx.ulife.utlis.UtilsSdkInitializer"
+                android:name="com.androidx.ulife.init.ApplicationStart"
                 android:value="android.startup" />
             <meta-data
-                android:name="com.androidx.ulife.utlis.RoomSdkInitializer"
+                android:name="com.androidx.ulife.init.UtilsSdkInitializer"
                 android:value="android.startup" />
             <meta-data
-                android:name="com.androidx.ulife.utlis.GlobalDataInitializer"
+                android:name="com.androidx.ulife.init.RoomSdkInitializer"
+                android:value="android.startup" />
+            <meta-data
+                android:name="com.androidx.ulife.init.GlobalDataInitializer"
                 android:value="android.startup" />
         </provider>
 

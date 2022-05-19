@@ -96,6 +96,7 @@ message UssdPart{
     string countryCode = 4;
     repeated UssdItem dataSet = 5;
     string ext = 6;
+    int32 version = 7;
 }
 /*********ussd end*************/
 
@@ -111,7 +112,7 @@ message QueryResponse {
         AdTxtPart adTxtPart = 6;
         AdPicPart adPicPart = 7;
         TopupPart topupPart = 8;
-        UssdPart ussdPart = 9;
+        UssdPart imsi1 = 9;
     }
 }
 /*********全部数据 begin***********/
