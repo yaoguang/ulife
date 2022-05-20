@@ -27,3 +27,17 @@ message QueryRequest{
   repeated QueryPart  partition = 2;
 }
 /*********ulife end***********/
+
+/*********查询分页数据或者更多数据 begin***********/
+message QueryPageEntity{
+  int32 version = 1;
+  int64 updateTime = 2;
+  int32 partType = 3;
+  int32 num = 4;
+}
+
+message QueryPageRequest{
+  GeneralParams general = 1;
+  QueryPageEntity page = 2;
+}
+/*********查询分页数据或者更多数据 begin***********/

@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.androidx.ulife.model.UlifeResp
+import com.androidx.ulife.model.copy
 
 @Entity(tableName = "home_ussd_part")
 data class HomeUssdPart(
@@ -17,9 +18,6 @@ data class HomeUssdPart(
     @ColumnInfo(name = "data_from") val dataFrom: Int?,
     @ColumnInfo(name = "data_byte") var dataArray: ByteArray? = null,
 ) {
-    @Ignore
-    var dataProto: UlifeResp.UssdPart? = null
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -44,5 +42,12 @@ data class HomeUssdPart(
         result = 31 * result + (updateTime?.hashCode() ?: 0)
         result = 31 * result + (dataFrom ?: 0)
         return result
+    }
+
+    fun toUssdImsiPart(): UlifeResp.ImsiPart? {
+        return dataArray?.let { UlifeResp.ImsiPart.parseFrom(it) }?.copy {
+            version = this@HomeUssdPart.version
+            updateTime = this@HomeUssdPart.updateTime ?: 0L
+        }
     }
 }

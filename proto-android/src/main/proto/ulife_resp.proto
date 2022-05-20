@@ -9,110 +9,143 @@ option java_package = "com.androidx.ulife.model";
 
 /*********金刚位 begin***********/
 message PinnedItem{
-    string clickAction = 1;
-    string iconUrl = 2;
-    string name = 3;
-    string floating = 4;
-    string floatingPeriod = 5;
+  string clickAction = 1;
+  string iconUrl = 2;
+  string name = 3;
+  string floating = 4;
+  string floatingPeriod = 5;
 }
 
 message PinnedPart{
-    int32 partType = 1;
-    bool ignoreMccmnc = 2;
-    repeated PinnedItem dataSet = 3;
-    string ext = 4;
+  int32 partType = 1;
+  int32 version = 2;
+  bool ignoreMccmnc = 3;
+  repeated PinnedItem dataSet = 4;
+  string ext = 5;
 }
 /*********金刚位 end*************/
 
 /*********文本广告位 begin***********/
 message AdTxtItem{
-    bool notiRed = 1;
-    string title = 2;
-    string clickAction = 3;
-    string textColor = 4;
+  bool notiRed = 1;
+  string title = 2;
+  string clickAction = 3;
+  string textColor = 4;
 }
 
 message AdTxtPart{
-    int32 partType = 1;
-    bool ignoreMccmnc = 2;
-    repeated AdTxtItem dataSet = 3;
-    string ext = 4;
+  int32 partType = 1;
+  int32 version = 2;
+  bool ignoreMccmnc = 3;
+  repeated AdTxtItem dataSet = 4;
+  string ext = 5;
 }
 /*********文本广告位 end***********/
 
 /*********图文广告位 begin***********/
 message AdPicItem{
-    string picUrl = 1;
-    string clickAction = 2;
+  string picUrl = 1;
+  string clickAction = 2;
 }
 
 message AdPicPart{
-    int32 partType = 1;
-    bool ignoreMccmnc = 2;
-    repeated AdPicItem dataSet = 3;
-    string ext = 4;
+  int32 partType = 1;
+  int32 version = 2;
+  bool ignoreMccmnc = 3;
+  repeated AdPicItem dataSet = 4;
+  string ext = 5;
 }
 /*********图文广告位 end***********/
 
 /*********充值 begin***********/
 message TopupItem{
-    int32 tag = 1;
-    string tagDetail = 2;
-    string bizType = 3;
-    string product = 4;
-    int32 originalPrice = 5;
-    int32 actualPrice = 6;
-    int32 discountRate = 7;
-    string goodsId = 8;
-    string packageId = 9;
-    string name = 10;
-    string goodsDesc = 11;
-    string currency = 12;
+  int32 tag = 1;
+  string tagDetail = 2;
+  string bizType = 3;
+  string product = 4;
+  int32 originalPrice = 5;
+  int32 actualPrice = 6;
+  int32 discountRate = 7;
+  string goodsId = 8;
+  string packageId = 9;
+  string name = 10;
+  string goodsDesc = 11;
+  string currency = 12;
 }
 
 message TopupPart{
-    int32 partType = 1;
-    string mccmnc = 2;
-    string operator = 3;
-    string countryCode = 4;
-    string country = 5;
-    repeated TopupItem dataSet = 6;
-    string ext = 7;
+  int32 partType = 1;
+  int32 version = 2;
+  string mccmnc = 3;
+  string operator = 4;
+  string countryCode = 5;
+  string country = 6;
+  repeated TopupItem dataSet = 7;
+  string ext = 8;
 }
 /*********充值 end*************/
 
 /*********ussd begin***********/
 message UssdItem{
-    string clickAction = 1;
-    string ussdLevel = 2;
-    string iconUrl = 3;
-    string name = 4;
+  string clickAction = 1;
+  string ussdLevel = 2;
+  string iconUrl = 3;
+  string name = 4;
+}
+
+message ImsiPart{
+  int32 partType = 1;
+  int32 version = 2;
+  int64 updateTime = 3;
+  string mccmnc = 4;
+  string operator = 5;
+  string countryCode = 6;
+  repeated UssdItem dataSet = 7;
+  string ext = 8;
 }
 
 message UssdPart{
-    int32 partType = 1;
-    string mccmnc = 2;
-    string operator = 3;
-    string countryCode = 4;
-    repeated UssdItem dataSet = 5;
-    string ext = 6;
-    int32 version = 7;
+  ImsiPart imsi1 = 1;
+  ImsiPart imsi2 = 2;
 }
 /*********ussd end*************/
 
 /*********全部数据 begin***********/
 
 message QueryResponse {
-    int32 code = 1;
-    string message = 2;
-    int32 version = 3;
-    int32 partType = 4;
-    oneof dataPart {
-        PinnedPart pinnedPart = 5;
-        AdTxtPart adTxtPart = 6;
-        AdPicPart adPicPart = 7;
-        TopupPart topupPart = 8;
-        UssdPart imsi1 = 9;
-    }
+  int32 code = 1;
+  string message = 2;
+  int32 version = 3;
+  int32 partType = 4;
+  int64 updateTime = 5;
+  oneof dataPart {
+    PinnedPart pinnedPart = 6;
+    AdTxtPart adTxtPart = 7;
+    AdPicPart adPicPart = 8;
+    TopupPart topupPart = 9;
+    UssdPart ussdPart = 10;
+  }
 }
 /*********全部数据 begin***********/
+
+/*********查询分页数据或者更多数据 begin***********/
+message PageEntity{
+  int32 version = 1;
+  int64 updateTime = 2;
+  int32 partType = 3;
+  int32 num = 4;
+  oneof dataPart {
+    PinnedPart pinnedPart = 5;
+    AdTxtPart adTxtPart = 6;
+    AdPicPart adPicPart = 7;
+    TopupPart topupPart = 8;
+    UssdPart ussdPart = 9;
+  }
+}
+
+message QueryPageResponse{
+  string code = 1;
+  string message = 2;
+  PageEntity pageEntity = 3;
+}
+/*********查询分页数据或者更多数据 begin***********/
