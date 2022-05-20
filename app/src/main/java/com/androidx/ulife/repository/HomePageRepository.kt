@@ -7,33 +7,34 @@ import com.androidx.ulife.net.GrpcApi
 import com.androidx.ulife.net.RetrofitApi
 import com.androidx.ulife.net.SuspendCallBack
 import com.androidx.ulife.simcard.SimCardManager
+import com.blankj.utilcode.util.LogUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object HomePageRepository {
     private val homePageDao by lazy { AppDatabase.appDb.homePageDao() }
-    private val homeUssdDao by lazy { AppDatabase.appDb.homeUsdDao() }
-
-    private val homePagePartCache = SparseArray<HomePagePart>()
-    private var homeUssdPartCache: HomePagePart? = null
+    private val homeUssdDao by lazy { AppDatabase.appDb.homeUssdDao() }
 
     private val responseCache = SparseArray<UlifeResp.QueryResponse>()
     private var ussdResponseCache: UlifeResp.QueryResponse? = null
 
     fun homePageInfo(): Flow<UlifeResp.QueryResponse?> {
         val partRequest = homePageDao.queryPartReqList()
-        val ussdRequest = createUssdHomePartRequest()
-        (partRequest as ArrayList).add(ussdRequest)
+        updateUssdRequest(partRequest)
         return GrpcApi.homePageInfo(partRequest)
             .map {
+                LogUtils.d("Response", it)
                 val request = partRequest.firstOrNull { req -> it.partType == req.partType } ?: return@map it
                 convertResponseData(request, it) ?: it
             }
     }
 
-    fun homePageInfo(reqParts: List<Int>): Flow<UlifeResp.QueryResponse?> {
+    fun homePageInfo(reqParts: ArrayList<Int>): Flow<UlifeResp.QueryResponse?> {
         val requests = homePageDao.queryPartReqList(reqParts)
-        val partRequest = reqParts.map { requests.firstOrNull { req -> req.partType == it } ?: HomePagePartRequest(null, it, 0, 0L) }
+        val partRequest = reqParts.map {
+            requests.firstOrNull { req -> req.partType == it } ?: HomePagePartRequest(null, it, 0, 0L)
+        }
+        updateUssdRequest(partRequest)
         return GrpcApi.homePageInfo(partRequest)
             .map {
                 val request = partRequest.firstOrNull { req -> it.partType == req.partType } ?: return@map it
@@ -45,13 +46,13 @@ object HomePageRepository {
         if (request == null)
             return null
         return if (request.partType == PART_TYPE_USSD) {
-            convertUssdResponseData(request, it)
+            convertUssdResponseData(request, convertNormalResponseData(request, it))
         } else {
             convertNormalResponseData(request, it)
         }
     }
 
-    private fun convertNormalResponseData(request: HomePagePartRequest, response: UlifeResp.QueryResponse): UlifeResp.QueryResponse? {
+    private fun convertNormalResponseData(request: HomePagePartRequest, response: UlifeResp.QueryResponse): UlifeResp.QueryResponse {
         var it = response
         // 未返回有效信息，仅更新数据库请求参数
         if (it.dataPartCase == UlifeResp.QueryResponse.DataPartCase.DATAPART_NOT_SET) {
@@ -62,7 +63,7 @@ object HomePageRepository {
             // 读取内存缓存
             var cacheResp = responseCache[request.partType]
             // 判断缓存可用，不可用的话，读取数据库缓存
-            if (cacheResp.dataPartCase == UlifeResp.QueryResponse.DataPartCase.DATAPART_NOT_SET) {
+            if (cacheResp == null || cacheResp.dataPartCase == UlifeResp.QueryResponse.DataPartCase.DATAPART_NOT_SET) {
                 cacheResp = homePageDao.queryPart(request.partType)?.toResponse()
             }
             if (cacheResp != null)
@@ -143,7 +144,14 @@ object HomePageRepository {
             )
             homeUssdDao.insert(homeUssdPart)
         }
-        return response
+        return it
+    }
+
+    private fun updateUssdRequest(partRequest: List<HomePagePartRequest>) {
+        partRequest.firstOrNull { it.partType == PART_TYPE_USSD }?.apply {
+            imsi1 = createUssdRequestBySim(SimCardManager.sim1)
+            imsi2 = createUssdRequestBySim(SimCardManager.sim2)
+        }
     }
 
     private fun createUssdHomePartRequest(): HomePagePartRequest {

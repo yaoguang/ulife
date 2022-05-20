@@ -10,15 +10,11 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.androidx.ulife.dao.AppDatabase
-import com.androidx.ulife.dao.HomePagePart
 import com.androidx.ulife.databinding.ActivityMainBinding
-import com.androidx.ulife.model.HomePagePartForm
-import com.androidx.ulife.model.RefreshMode
 import com.androidx.ulife.model.adPicItem
-import com.blankj.utilcode.util.LogUtils
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -30,8 +26,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-
-        val homePageDao = AppDatabase.appDb.homePageDao()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -47,45 +41,18 @@ class MainActivity : AppCompatActivity() {
                 .setAnchorView(R.id.fab)
                 .setAction("Action", null).show()
 
-            GlobalScope.launch(Dispatchers.IO) {
-                val localList = arrayListOf(
-                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData()),
-                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_CREATE.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData()),
-                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_NEXT.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData()),
-                    HomePagePart(null, Random.nextInt(5), Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, randomData())
-                )
-                homePageDao.insert(localList)
-
-                LogUtils.d("Part Info", homePageDao.queryPart(Random.nextInt(5)))
-
-//                val partReq = homePageDao.queryPartReq(3)
-//                delay(5000)
-//                partReq?.let {
-//                    it.updateTime = System.currentTimeMillis()
-//                    it.version += 10
-//                    homePageDao.updateReqPart(it)
-//                }
+            CoroutineScope(Dispatchers.IO).launch {
+                AppDatabase.appDb.homePageDao().clearOldParts()
+                AppDatabase.appDb.homeUssdDao().clearOldParts()
             }
         }
-
-//        GlobalScope.launch(Dispatchers.Main) {
-//            val channel = ManagedChannelBuilder
-//                .forAddress("192.168.31.198", 50051)
-//                .usePlaintext()
-//                .executor(Dispatchers.IO.asExecutor())
-//                .build()
-//
-//            val hello = GreeterGrpcKt.GreeterCoroutineStub(channel)
-//
-//            val resp = withContext(Dispatchers.IO) {
-//                hello.sayHello(helloRequest { name = "123" })
-//            }
-//            ToastUtils.showShort(resp.message)
-//        }
-
-//        val ulife = UlifeServiceGrpcKt.UlifeServiceCoroutineStub(channel)
-//        val resp =  ulife.queryUlife(queryRequest {  })
-
+        binding.fab.setOnLongClickListener{
+            CoroutineScope(Dispatchers.IO).launch {
+                AppDatabase.appDb.homePageDao().resetVersion()
+                AppDatabase.appDb.homeUssdDao().resetVersion()
+            }
+            return@setOnLongClickListener true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

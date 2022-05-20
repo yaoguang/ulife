@@ -6,5 +6,5 @@ import androidx.room.RoomDatabase
 @Database(entities = [HomePagePart::class, HomeUssdPart::class], version = 1, exportSchema = false)
 abstract class AppDatabaseImpl : RoomDatabase() {
     abstract fun homePageDao(): HomePageDao
-    abstract fun homeUsdDao(): HomeUssdDao
+    abstract fun homeUssdDao(): HomeUssdDao
 }

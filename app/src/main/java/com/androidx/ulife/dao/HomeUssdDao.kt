@@ -30,4 +30,7 @@ interface HomeUssdDao {
 
     @Query("delete from home_ussd_part where id not in (select id from (select id,(mcc*1000+mnc) as mcc_mnc from home_ussd_part order by -version,-update_time) group by mcc_mnc)")
     fun clearOldParts(): Int
+
+    @Query("update home_ussd_part set version=1")
+    fun resetVersion():Int
 }

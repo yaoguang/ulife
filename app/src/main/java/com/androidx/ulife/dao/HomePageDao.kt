@@ -38,4 +38,7 @@ interface HomePageDao {
     // 数据库有变化就会有回调
     @Query("select * from home_page_part where part_type=:partType order by -version,-update_time limit 1")
     fun queryPartLiveData(partType: Int): LiveData<HomePagePart?>
+
+    @Query("update home_page_part set version=1")
+    fun resetVersion():Int
 }

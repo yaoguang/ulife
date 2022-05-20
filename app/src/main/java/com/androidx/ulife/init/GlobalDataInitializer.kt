@@ -4,13 +4,13 @@ import android.content.Context
 import com.androidx.ulife.dao.AppDatabase
 import com.androidx.ulife.dao.HomePageDao
 import com.androidx.ulife.dao.HomePagePart
+import com.androidx.ulife.dao.HomeUssdPart
 import com.androidx.ulife.model.HomePagePartForm
 import com.androidx.ulife.model.RefreshMode
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.SPUtils
 import com.rousetime.android_startup.AndroidStartup
 import com.rousetime.android_startup.Startup
-import kotlin.random.Random
 
 class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
     private var homePageDao: HomePageDao? = null
@@ -19,6 +19,7 @@ class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
         homePageDao = AppDatabase.appDb.homePageDao()
         initGlobalData()
         homePageDao?.clearOldParts()
+        AppDatabase.appDb.homeUssdDao().clearOldParts()
         return this
     }
 
@@ -41,11 +42,24 @@ class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
 
     private fun copyGlobalInfoToDatabase() {
         val localList = arrayListOf(
-            HomePagePart(null, 1, Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
-            HomePagePart(null, 2, Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_CREATE.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
-            HomePagePart(null, 3, Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_NEXT.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
-            HomePagePart(null, 4, Random.nextInt(20), System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, null)
+            HomePagePart(null, 1, 1, System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
+            HomePagePart(null, 2, 1, System.currentTimeMillis(), RefreshMode.ON_CREATE.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
+            HomePagePart(null, 4, 1, System.currentTimeMillis(), RefreshMode.ON_NEXT.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
+            HomePagePart(null, 8, 1, System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
+            HomePagePart(null, 16, 1, System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, null),
+            HomePagePart(null, 32, 1, System.currentTimeMillis(), RefreshMode.ON_RESUME.ordinal, HomePagePartForm.GLOBAL.ordinal, null)
         )
+        val ussdLocal = localList.firstOrNull { it.partType == 16 }
+        if (ussdLocal != null) {
+            AppDatabase.appDb.homeUssdDao().insert(
+                arrayListOf(
+                    HomeUssdPart(null, 400, 19, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeUssdPart(null, 400, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeUssdPart(null, 500, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeUssdPart(null, 500, 21, 1, 0, HomePagePartForm.GLOBAL.ordinal, null)
+                )
+            )
+        }
         homePageDao?.insert(localList)
     }
 
