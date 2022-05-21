@@ -1,6 +1,7 @@
 package com.androidx.ulife.dao
 
 import androidx.room.ColumnInfo
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.androidx.ulife.model.UlifeReq
 import com.androidx.ulife.model.queryUssdPart
@@ -13,6 +14,9 @@ data class HomeUssdPartRequest(
     @ColumnInfo(name = "version") var version: Int,
     @ColumnInfo(name = "update_time") var updateTime: Long
 ) {
+    @Ignore
+    val mccMnc: String = "$mcc-$mnc"
+
     fun toUssdRequest(): UlifeReq.QueryUssdPart {
         return queryUssdPart {
             version = this@HomeUssdPartRequest.version

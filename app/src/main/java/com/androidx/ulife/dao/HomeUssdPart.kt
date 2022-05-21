@@ -18,6 +18,17 @@ data class HomeUssdPart(
     @ColumnInfo(name = "data_from") val dataFrom: Int?,
     @ColumnInfo(name = "data_byte") var dataArray: ByteArray? = null,
 ) {
+    @Ignore
+    var dataProto: UlifeResp.ImsiPart? = null
+
+    @Ignore
+    val mccMnc: String = "$mcc-$mnc"
+
+    init {
+        if (dataArray != null)
+            dataProto = UlifeResp.ImsiPart.parseFrom(dataArray)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

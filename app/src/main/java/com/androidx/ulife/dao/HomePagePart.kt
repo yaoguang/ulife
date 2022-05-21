@@ -18,7 +18,15 @@ data class HomePagePart(
     @ColumnInfo(name = "data_byte") var dataArray: ByteArray? = null,
 ) {
     @Ignore
-    var dataProto: Any? = null
+    var dataProto: UlifeResp.QueryResponse? = null
+
+    @Ignore
+    var dataPart: Any? = null
+
+    init {
+        if (dataArray != null)
+            dataProto = UlifeResp.QueryResponse.parseFrom(dataArray)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
