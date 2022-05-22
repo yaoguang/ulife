@@ -1,5 +1,6 @@
 plugins {
-    id 'com.android.application'
+//    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 //    id 'com.google.protobuf'
@@ -9,7 +10,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.androidx.ulife"
+//        applicationId "com.androidx.ulife"
         minSdk 29
         targetSdk 32
         versionCode 1
@@ -71,7 +72,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
 
     def room_version = "2.4.2"
-    implementation "androidx.room:room-runtime:$room_version"
+    api "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
     api project(':proto-android')
