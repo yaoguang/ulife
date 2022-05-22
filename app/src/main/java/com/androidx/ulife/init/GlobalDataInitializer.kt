@@ -7,6 +7,7 @@ import com.androidx.ulife.dao.HomePagePart
 import com.androidx.ulife.dao.HomeUssdPart
 import com.androidx.ulife.model.HomePagePartForm
 import com.androidx.ulife.model.RefreshMode
+import com.androidx.ulife.repository.HomePageRepository
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.SPUtils
 import com.rousetime.android_startup.AndroidStartup
@@ -38,6 +39,7 @@ class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
             copyGlobalInfoToDatabase()
             SPUtils.getInstance().put(KEY_UPDATE_GLOBAL_DATA_VERSION, appVersion)
         }
+        HomePageRepository.initFlowInfo()
     }
 
     private fun copyGlobalInfoToDatabase() {

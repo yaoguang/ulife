@@ -7,7 +7,7 @@ data class SimCardInfo(
     val mcc: Int,
     val mnc: Int,
 ) {
-    val mccMnc = mcc * 1000 + mnc
+    val mccMnc = "$mcc-$mnc"
 
     fun isValued(): Boolean = subIndex > 0
 }

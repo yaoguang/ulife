@@ -40,7 +40,7 @@ data class HomeUssdPart(
         if (mnc != other.mnc) return false
         if (version != other.version) return false
         if (updateTime != other.updateTime) return false
-        if (dataFrom != other.dataFrom) return false
+//        if (dataFrom != other.dataFrom) return false
 
         return true
     }

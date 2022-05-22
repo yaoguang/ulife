@@ -7,8 +7,9 @@ import com.androidx.ulife.net.GrpcApi
 import com.androidx.ulife.net.RetrofitApi
 import com.androidx.ulife.net.SuspendCallBack
 import com.androidx.ulife.simcard.SimCardManager
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
+import com.blankj.utilcode.util.LogUtils
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 object HomePageRepository {
     private val homePageDao by lazy { AppDatabase.appDb.homePageDao() }
@@ -16,6 +17,97 @@ object HomePageRepository {
 
     private val partCache = SparseArray<HomePagePart>()
     private val ussdPartCache = HashMap<String, HomeUssdPart>()
+
+    val partListState = MutableStateFlow(SparseArray<HomePagePart>())
+
+    val partRefreshShare = MutableSharedFlow<HomePagePart>()
+
+    fun initFlowInfo() {
+        CoroutineScope(Dispatchers.IO).launch {
+            LogUtils.i("init_info", "localInfo")
+            val localParts = localInfo()
+            localParts.forEach {
+                partCache[it.partType] = it
+                updatePartInfoCache(it)
+            }
+            LogUtils.i("init_info", "homePageInfo")
+            homePageInfo()
+                .catch {
+                    LogUtils.e("init_info", "init request error ", it.message)
+                }
+                .onCompletion {
+                    LogUtils.i("init_info", "request over")
+                }
+                .collect {
+                    notifyListState(it)
+                }
+        }
+    }
+
+    private fun updatePartInfoCache(part: HomePagePart) {
+        when (part.partType) {
+            PART_TYPE_USSD -> {
+                val imsiListPart = part.dataPart as? HomeImsiListPart ?: return
+                imsiListPart.imsi1?.let { ussdPartCache[it.mccMnc] = it }
+                imsiListPart.imsi2?.let { ussdPartCache[it.mccMnc] = it }
+            }
+        }
+    }
+
+    suspend fun localInfo(): List<HomePagePart> {
+        val parts = homePageDao.queryParts()
+        parts.forEach {
+            when (it.partType) {
+                PART_TYPE_USSD -> convertUssdLocalData(it)
+            }
+        }
+        notifyListState(parts as ArrayList<HomePagePart>)
+        return parts
+    }
+
+    private fun convertUssdLocalData(part: HomePagePart) {
+        val imsiListPart = HomeImsiListPart()
+        if (SimCardManager.sim1.isValued())
+            imsiListPart.imsi1 = convertUssdImsiLocalData(part, SimCardManager.sim1, 1)
+        if (SimCardManager.sim2.isValued())
+            imsiListPart.imsi2 = convertUssdImsiLocalData(part, SimCardManager.sim2, 2)
+        part.dataPart = imsiListPart
+        part.dataProto = null
+        part.dataArray = null
+    }
+
+    private fun convertUssdImsiLocalData(part: HomePagePart, cardInfo: SimCardInfo, simIndex: Int): HomeUssdPart {
+        var cachePart = homeUssdDao.queryPart(cardInfo.mcc, cardInfo.mnc)
+        // 缓存不存在，使用简单返回值
+        if (cachePart == null) {
+            cachePart = HomeUssdPart(null, cardInfo.mcc, cardInfo.mnc, 0, part.updateTime, HomePagePartForm.NET.ordinal, null)
+        }
+        return cachePart
+    }
+
+    private suspend fun notifyListState(part: ArrayList<HomePagePart>) {
+        val stateValue = partListState.value
+        var notify = false
+        part.filter {
+            it != stateValue[it.partType]
+        }.forEach {
+            stateValue[it.partType] = it
+            notify = true
+            partRefreshShare.emit(it)
+        }
+        if (notify) {
+            partListState.emit(stateValue.clone())
+        }
+    }
+
+    private suspend fun notifyListState(part: HomePagePart) {
+        val stateValue = partListState.value
+        if (part != stateValue[part.partType]) {
+            stateValue[part.partType] = part
+            partRefreshShare.emit(part)
+            partListState.emit(stateValue.clone())
+        }
+    }
 
     fun homePageInfo(): Flow<HomePagePart> {
         val partRequest = homePageDao.queryPartReqList()
@@ -25,6 +117,7 @@ object HomePageRepository {
                 val request = partRequest.firstOrNull { req -> it.partType == req.partType } ?: return@mapNotNull null
                 convertResponseData(request, it)
             }
+            .onEach { notifyListState(it) }
     }
 
     fun homePageInfo(reqParts: ArrayList<Int>): Flow<HomePagePart> {
@@ -38,9 +131,10 @@ object HomePageRepository {
                 val request = partRequest.firstOrNull { req -> it.partType == req.partType } ?: return@mapNotNull null
                 convertResponseData(request, it)
             }
+            .onEach { notifyListState(it) }
     }
 
-    private fun convertResponseData(request: HomePagePartRequest, response: UlifeResp.QueryResponse): HomePagePart? {
+    private fun convertResponseData(request: HomePagePartRequest, response: UlifeResp.QueryResponse): HomePagePart {
         val it: HomePagePart = convertNormalResponseData(request, response)
         when (request.partType) {
             PART_TYPE_USSD -> convertUssdResponseData(request, it, response)

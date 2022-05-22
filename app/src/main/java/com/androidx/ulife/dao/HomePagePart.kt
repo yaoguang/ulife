@@ -37,9 +37,10 @@ data class HomePagePart(
         if (id != other.id) return false
         if (partType != other.partType) return false
         if (version != other.version) return false
-        if (updateTime != other.updateTime) return false
         if (refreshMode != other.refreshMode) return false
-        if (dataFrom != other.dataFrom) return false
+        if (dataPart != other.dataPart) return false
+//        if (updateTime != other.updateTime) return false
+//        if (dataFrom != other.dataFrom) return false
 
         return true
     }
