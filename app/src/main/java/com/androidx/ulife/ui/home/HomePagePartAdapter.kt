@@ -17,7 +17,7 @@ class HomePagePartAdapter : BaseViewBindingQuickAdapter<HomePagePart, ItemHomePa
     override fun convert(holder: BaseViewBindingHolder<ItemHomePageBinding>, item: HomePagePart) {
         val sp = StringBuilder()
         sp.append("type:${item.partType}； version:${item.version}； time:${item.updateTime}； data:${item.dataProto?.dataPartCase}")
-        if (item.partType == PART_TYPE_USSD) {
+        if (item.partType == PART_TYPE_USSD && item.dataPart != null) {
             appendImsi(sp, (item.dataPart as HomeImsiListPart).imsi1)
             appendImsi(sp, (item.dataPart as HomeImsiListPart).imsi2)
         }

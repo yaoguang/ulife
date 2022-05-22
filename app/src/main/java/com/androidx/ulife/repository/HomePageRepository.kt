@@ -259,6 +259,16 @@ object HomePageRepository {
         else null
     }
 
+    suspend fun clearUssdState() {
+        val stateValue = partListState.value
+        val cachePart = stateValue[PART_TYPE_USSD]
+        cachePart?.let {
+            it.dataPart = null
+            partListState.emit(stateValue.clone())
+            partRefreshShare.emit(it)
+        }
+    }
+
     /**
      * 协程中使用
      */

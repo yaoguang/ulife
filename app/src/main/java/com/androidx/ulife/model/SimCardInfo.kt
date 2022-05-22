@@ -9,5 +9,5 @@ data class SimCardInfo(
 ) {
     val mccMnc = "$mcc-$mnc"
 
-    fun isValued(): Boolean = subIndex > 0
+    fun isValued(): Boolean = subIndex >= 0
 }
