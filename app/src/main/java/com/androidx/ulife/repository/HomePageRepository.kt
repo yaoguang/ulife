@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.*
 
 object HomePageRepository {
     private val homePageDao by lazy { AppDatabase.appDb.homePageDao() }
-    private val homeUssdDao by lazy { AppDatabase.appDb.homeUssdDao() }
+    private val homeUssdDao by lazy { AppDatabase.appDb.homeCarrierDao() }
 
     private val partCache = SparseArray<HomePagePart>()
-    private val ussdPartCache = HashMap<String, HomeUssdPart>()
+    private val carrierCache = HashMap<String, HomeCarrierPart>()
 
     val partListState = MutableStateFlow(SparseArray<HomePagePart>())
 
@@ -38,18 +38,16 @@ object HomePageRepository {
                 .onCompletion {
                     LogUtils.i("init_info", "request over")
                 }
-                .collect {
-                    notifyListState(it)
-                }
+                .collect()
         }
     }
 
     private fun updatePartInfoCache(part: HomePagePart) {
         when (part.partType) {
             PART_TYPE_USSD -> {
-                val imsiListPart = part.dataPart as? HomeImsiListPart ?: return
-                imsiListPart.imsi1?.let { ussdPartCache[it.mccMnc] = it }
-                imsiListPart.imsi2?.let { ussdPartCache[it.mccMnc] = it }
+                val imsiListPart = part.dataPart as? HomeUssdPart ?: return
+                imsiListPart.imsi1?.let { carrierCache[it.mccMnc] = it }
+                imsiListPart.imsi2?.let { carrierCache[it.mccMnc] = it }
             }
         }
     }
@@ -66,7 +64,7 @@ object HomePageRepository {
     }
 
     private fun convertUssdLocalData(part: HomePagePart) {
-        val imsiListPart = HomeImsiListPart()
+        val imsiListPart = HomeUssdPart()
         if (SimCardManager.sim1.isValued())
             imsiListPart.imsi1 = convertUssdImsiLocalData(part, SimCardManager.sim1, 1)
         if (SimCardManager.sim2.isValued())
@@ -76,11 +74,11 @@ object HomePageRepository {
         part.dataArray = null
     }
 
-    private fun convertUssdImsiLocalData(part: HomePagePart, cardInfo: SimCardInfo, simIndex: Int): HomeUssdPart {
+    private fun convertUssdImsiLocalData(part: HomePagePart, cardInfo: SimCardInfo, simIndex: Int): HomeCarrierPart {
         var cachePart = homeUssdDao.queryPart(cardInfo.mcc, cardInfo.mnc)
         // 缓存不存在，使用简单返回值
         if (cachePart == null) {
-            cachePart = HomeUssdPart(null, cardInfo.mcc, cardInfo.mnc, 0, part.updateTime, HomePagePartForm.NET.ordinal, null)
+            cachePart = HomeCarrierPart(null, cardInfo.mcc, cardInfo.mnc, 0, part.updateTime, HomePagePartForm.NET.ordinal, null)
         }
         return cachePart
     }
@@ -186,7 +184,7 @@ object HomePageRepository {
     }
 
     private fun convertUssdResponseData(request: HomePagePartRequest, part: HomePagePart, response: UlifeResp.QueryResponse) {
-        val imsiListPart = HomeImsiListPart()
+        val imsiListPart = HomeUssdPart()
         val ussdPart = if (response.hasUssdPart()) response.ussdPart else null
         if (request.imsi1 != null)
             imsiListPart.imsi1 = convertUssdImsiResponseData(request.imsi1!!, response, ussdPart?.imsi1, 1)
@@ -197,8 +195,8 @@ object HomePageRepository {
         part.dataArray = null
     }
 
-    private fun convertUssdImsiResponseData(request: HomeUssdPartRequest, response: UlifeResp.QueryResponse, imsi: UlifeResp.ImsiPart?, simIndex: Int): HomeUssdPart {
-        val part: HomeUssdPart
+    private fun convertUssdImsiResponseData(request: HomeCarrierPartRequest, response: UlifeResp.QueryResponse, imsi: UlifeResp.ImsiPart?, simIndex: Int): HomeCarrierPart {
+        val part: HomeCarrierPart
         // 当前卡号未返回有效数据,需要读取缓存数据，返回接口使用，更新数据库请求时间
         if (imsi == null || imsi.dataSetList.isNullOrEmpty()) {
             // 更新数据库请求时间
@@ -206,7 +204,7 @@ object HomePageRepository {
             homeUssdDao.updateReqPart(request)
 
             // 读取内存缓存
-            var cachePart = ussdPartCache[request.mccMnc]
+            var cachePart = carrierCache[request.mccMnc]
             // 更新内存缓存信息
             if (cachePart != null)
                 cachePart.updateTime = request.updateTime
@@ -218,14 +216,14 @@ object HomePageRepository {
 
             // 缓存不存在，使用简单返回值
             if (cachePart == null) {
-                cachePart = HomeUssdPart(request.id, request.mcc, request.mnc, request.version, request.updateTime, HomePagePartForm.NET.ordinal, imsi?.toByteArray()).apply { dataProto = imsi }
+                cachePart = HomeCarrierPart(request.id, request.mcc, request.mnc, request.version, request.updateTime, HomePagePartForm.NET.ordinal, imsi?.toByteArray()).apply { dataProto = imsi }
             }
             part = cachePart
         } else {
             // 当前卡号返回了有效数据,需要写入缓存数据，返回接口使用，更新数据库imsi数据内容
             // 写入缓存后续统一处理
             // 更新数据库imsi数据内容
-            part = HomeUssdPart(
+            part = HomeCarrierPart(
                 null,
                 request.mcc, request.mnc,
                 imsi.version, imsi.updateTime,
@@ -235,7 +233,7 @@ object HomePageRepository {
             part.dataProto = imsi
             homeUssdDao.insert(part)
         }
-        ussdPartCache[request.mccMnc] = part
+        carrierCache[request.mccMnc] = part
         return part
     }
 
@@ -253,9 +251,9 @@ object HomePageRepository {
         }
     }
 
-    private fun createUssdRequestBySim(sim: SimCardInfo): HomeUssdPartRequest? {
+    private fun createUssdRequestBySim(sim: SimCardInfo): HomeCarrierPartRequest? {
         return if (sim.isValued())
-            homeUssdDao.queryPartReq(sim.mcc, sim.mnc) ?: HomeUssdPartRequest(null, sim.mcc, sim.mnc, 0, 0L)
+            homeUssdDao.queryPartReq(sim.mcc, sim.mnc) ?: HomeCarrierPartRequest(null, sim.mcc, sim.mnc, 0, 0L)
         else null
     }
 

@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.androidx.ulife.model.UlifeReq
 import com.androidx.ulife.model.queryUssdPart
 
-data class HomeUssdPartRequest(
+data class HomeCarrierPartRequest(
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
     @ColumnInfo(name = "mcc") val mcc: Int,
@@ -19,10 +19,10 @@ data class HomeUssdPartRequest(
 
     fun toUssdRequest(): UlifeReq.QueryUssdPart {
         return queryUssdPart {
-            version = this@HomeUssdPartRequest.version
-            updateTime = this@HomeUssdPartRequest.updateTime
-            mcc = this@HomeUssdPartRequest.mcc
-            mnc = this@HomeUssdPartRequest.mnc
+            version = this@HomeCarrierPartRequest.version
+            updateTime = this@HomeCarrierPartRequest.updateTime
+            mcc = this@HomeCarrierPartRequest.mcc
+            mnc = this@HomeCarrierPartRequest.mnc
         }
     }
 }

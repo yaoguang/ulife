@@ -15,10 +15,10 @@ data class HomePagePartRequest(
     @ColumnInfo(name = "update_time") var updateTime: Long
 ) {
     @Ignore
-    var imsi1: HomeUssdPartRequest? = null
+    var imsi1: HomeCarrierPartRequest? = null
 
     @Ignore
-    var imsi2: HomeUssdPartRequest? = null
+    var imsi2: HomeCarrierPartRequest? = null
 
     fun toHomePartRequest(): UlifeReq.QueryPart {
         return queryPart {

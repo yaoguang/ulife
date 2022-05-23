@@ -4,7 +4,7 @@ import android.content.Context
 import com.androidx.ulife.dao.AppDatabase
 import com.androidx.ulife.dao.HomePageDao
 import com.androidx.ulife.dao.HomePagePart
-import com.androidx.ulife.dao.HomeUssdPart
+import com.androidx.ulife.dao.HomeCarrierPart
 import com.androidx.ulife.model.HomePagePartForm
 import com.androidx.ulife.model.RefreshMode
 import com.androidx.ulife.repository.HomePageRepository
@@ -20,7 +20,7 @@ class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
         homePageDao = AppDatabase.appDb.homePageDao()
         initGlobalData()
         homePageDao?.clearOldParts()
-        AppDatabase.appDb.homeUssdDao().clearOldParts()
+        AppDatabase.appDb.homeCarrierDao().clearOldParts()
         return this
     }
 
@@ -53,12 +53,12 @@ class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
         )
         val ussdLocal = localList.firstOrNull { it.partType == 16 }
         if (ussdLocal != null) {
-            AppDatabase.appDb.homeUssdDao().insert(
+            AppDatabase.appDb.homeCarrierDao().insert(
                 arrayListOf(
-                    HomeUssdPart(null, 400, 19, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
-                    HomeUssdPart(null, 400, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
-                    HomeUssdPart(null, 500, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
-                    HomeUssdPart(null, 500, 21, 1, 0, HomePagePartForm.GLOBAL.ordinal, null)
+                    HomeCarrierPart(null, 400, 19, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeCarrierPart(null, 400, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeCarrierPart(null, 500, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeCarrierPart(null, 500, 21, 1, 0, HomePagePartForm.GLOBAL.ordinal, null)
                 )
             )
         }

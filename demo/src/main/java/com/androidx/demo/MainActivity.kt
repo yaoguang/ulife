@@ -41,13 +41,13 @@ class MainActivity : AppCompatActivity() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 AppDatabase.appDb.homePageDao().clearOldParts()
-                AppDatabase.appDb.homeUssdDao().clearOldParts()
+                AppDatabase.appDb.homeCarrierDao().clearOldParts()
             }
         }
         binding.fab.setOnLongClickListener{
             CoroutineScope(Dispatchers.IO).launch {
                 AppDatabase.appDb.homePageDao().resetVersion()
-                AppDatabase.appDb.homeUssdDao().resetVersion()
+                AppDatabase.appDb.homeCarrierDao().resetVersion()
             }
             return@setOnLongClickListener true
         }
