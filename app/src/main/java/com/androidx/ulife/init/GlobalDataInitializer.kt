@@ -55,10 +55,10 @@ class GlobalDataInitializer : AndroidStartup<GlobalDataInitializer>() {
         if (ussdLocal != null) {
             AppDatabase.appDb.homeCarrierDao().insert(
                 arrayListOf(
-                    HomeCarrierPart(null, 400, 19, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
-                    HomeCarrierPart(null, 400, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
-                    HomeCarrierPart(null, 500, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
-                    HomeCarrierPart(null, 500, 21, 1, 0, HomePagePartForm.GLOBAL.ordinal, null)
+                    HomeCarrierPart(null, 8, 400, 19, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeCarrierPart(null, 8, 400, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeCarrierPart(null, 16, 500, 20, 1, 0, HomePagePartForm.GLOBAL.ordinal, null),
+                    HomeCarrierPart(null, 16, 500, 21, 1, 0, HomePagePartForm.GLOBAL.ordinal, null)
                 )
             )
         }

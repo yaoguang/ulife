@@ -11,12 +11,18 @@ message GeneralParams {
   string language = 5;
   string iccid1 = 6;
   string iccid2 = 7;
-  string chId = 8;
-  string os = 9;
-  string appVersion = 10;
-  string networkType = 11;
-  string model = 12;
-  string brand = 13;
-  string manufacturer = 14;
-  string mccMnc = 15;
+  string mcc1 = 8;
+  string mcc2 = 9;
+  string mnc1 = 10;
+  string mnc2 = 11;
+  string imsi1 = 12;
+  string imsi2 = 13;
+  int32 defaultSim = 14;
+  string chId = 15;
+  string os = 16;
+  string appVersion = 17;
+  int32 networkType = 18;
+  string model = 19;
+  string brand = 20;
+  string manufacturer = 21;
 }

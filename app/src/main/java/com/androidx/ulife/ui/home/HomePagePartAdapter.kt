@@ -2,7 +2,7 @@ package com.androidx.ulife.ui.home
 
 import android.annotation.SuppressLint
 import com.androidx.ulife.R
-import com.androidx.ulife.dao.HomeUssdPart
+import com.androidx.ulife.dao.HomeImsiListPart
 import com.androidx.ulife.dao.HomePagePart
 import com.androidx.ulife.dao.HomeCarrierPart
 import com.androidx.ulife.databinding.ItemHomePageBinding
@@ -18,15 +18,15 @@ class HomePagePartAdapter : BaseViewBindingQuickAdapter<HomePagePart, ItemHomePa
         val sp = StringBuilder()
         sp.append("type:${item.partType}； version:${item.version}； time:${item.updateTime}； data:${item.dataProto?.dataPartCase}")
         if (item.partType == PART_TYPE_USSD && item.dataPart != null) {
-            appendImsi(sp, (item.dataPart as HomeUssdPart).imsi1)
-            appendImsi(sp, (item.dataPart as HomeUssdPart).imsi2)
+            appendImsi(sp, (item.dataPart as HomeImsiListPart).imsi1)
+            appendImsi(sp, (item.dataPart as HomeImsiListPart).imsi2)
         }
         holder.binding.info.text = sp
     }
 
     private fun appendImsi(sp: StringBuilder, part: HomeCarrierPart?) {
-        val imsi: UlifeResp.ImsiPart? = part?.dataProto
+        val imsi = part?.dataProto as? UlifeResp.ImsiUssdPart?
         if (imsi != null)
-            sp.append("\nimsi1: mccMnc:${imsi.mccmnc}； version:${part.version}； time:${part.updateTime}； data:${imsi.dataSetList.size}")
+            sp.append("\nimsi1: mccMnc:${imsi.imsi}； version:${part.version}； time:${part.updateTime}； data:${imsi.dataSetList.size}")
     }
 }

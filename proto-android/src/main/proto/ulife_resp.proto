@@ -19,7 +19,7 @@ message PinnedItem{
 message PinnedPart{
   int32 partType = 1;
   int32 version = 2;
-  bool ignoreMccmnc = 3;
+  bool ignoreMcc = 3;
   repeated PinnedItem dataSet = 4;
   string ext = 5;
 }
@@ -36,7 +36,7 @@ message AdTxtItem{
 message AdTxtPart{
   int32 partType = 1;
   int32 version = 2;
-  bool ignoreMccmnc = 3;
+  bool ignoreMcc = 3;
   repeated AdTxtItem dataSet = 4;
   string ext = 5;
 }
@@ -51,14 +51,29 @@ message AdPicItem{
 message AdPicPart{
   int32 partType = 1;
   int32 version = 2;
-  bool ignoreMccmnc = 3;
+  bool ignoreMcc = 3;
   repeated AdPicItem dataSet = 4;
   string ext = 5;
 }
 /*********图文广告位 end***********/
 
+/*********悬浮告广告 begin***********/
+message AdFloatingItem{
+  string picUrl = 1;
+  string clickAction = 2;
+}
+
+message AdFloatingPart{
+  int32 partType = 1;
+  int32 version = 2;
+  bool ignoreMcc = 3;
+  repeated AdFloatingItem dataSet = 4;
+  string ext = 5;
+}
+/*********悬浮广告 end***********/
+
 /*********充值 begin***********/
-message TopupItem{
+message RechargeItem{
   int32 tag = 1;
   string tagDetail = 2;
   string bizType = 3;
@@ -73,19 +88,21 @@ message TopupItem{
   string currency = 12;
 }
 
-message TopupPart{
+message ImsiRechargePart{
   int32 partType = 1;
   int32 version = 2;
-  string mccmnc = 3;
-  string operator = 4;
-  string countryCode = 5;
-  string country = 6;
-  repeated TopupItem dataSet = 7;
-  string ext = 8;
+  string imsi = 3;
+  repeated RechargeItem dataSet = 4;
+  string ext = 5;
+}
+
+message RechargePart{
+  ImsiRechargePart imsi1 = 1;
+  ImsiRechargePart imsi2 = 2;
 }
 /*********充值 end*************/
 
-/*********ussd begin***********/
+/*********USSD begin***********/
 message UssdItem{
   string clickAction = 1;
   string ussdLevel = 2;
@@ -93,38 +110,35 @@ message UssdItem{
   string name = 4;
 }
 
-message ImsiPart{
+message ImsiUssdPart{
   int32 partType = 1;
   int32 version = 2;
-  int64 updateTime = 3;
-  string mccmnc = 4;
-  string operator = 5;
-  string countryCode = 6;
-  repeated UssdItem dataSet = 7;
-  string ext = 8;
+  string imsi = 3;
+  repeated UssdItem dataSet = 4;
+  string ext = 5;
 }
 
 message UssdPart{
-  ImsiPart imsi1 = 1;
-  ImsiPart imsi2 = 2;
+  ImsiUssdPart imsi1 = 1;
+  ImsiUssdPart imsi2 = 2;
 }
-/*********ussd end*************/
+/*********USSD end*************/
 
 /*********全部数据 begin***********/
-
 message QueryResponse {
   int32 code = 1;
   string message = 2;
   int32 version = 3;
   int32 partType = 4;
-  int64 updateTime = 5;
   oneof dataPart {
-    PinnedPart pinnedPart = 6;
-    AdTxtPart adTxtPart = 7;
-    AdPicPart adPicPart = 8;
-    TopupPart topupPart = 9;
+    PinnedPart pinnedPart = 5;
+    AdTxtPart adTxtPart = 6;
+    AdPicPart adPicPart = 7;
+    AdFloatingPart adFloatingPart = 8;
+    RechargePart rechargePart = 9;
     UssdPart ussdPart = 10;
   }
+  int64 updateTime = 11;
 }
 /*********全部数据 begin***********/
 
@@ -138,8 +152,9 @@ message PageEntity{
     PinnedPart pinnedPart = 5;
     AdTxtPart adTxtPart = 6;
     AdPicPart adPicPart = 7;
-    TopupPart topupPart = 8;
-    UssdPart ussdPart = 9;
+    AdFloatingPart adFloatingPart = 8;
+    RechargePart rechargePart = 9;
+    UssdPart ussdPart = 10;
   }
 }
 

@@ -21,8 +21,8 @@ class HomePageAdapter : BaseViewBindingQuickAdapter<UlifeResp.QueryResponse, Ite
         holder.binding.info.text = sp
     }
 
-    private fun appendImsi(sp: StringBuilder, imsi: UlifeResp.ImsiPart?) {
+    private fun appendImsi(sp: StringBuilder, imsi: UlifeResp.ImsiUssdPart?) {
         if (imsi != null)
-            sp.append("\nimsi1: mccMnc:${imsi.mccmnc}； version:${imsi.version}； time:${imsi.updateTime}； data:${imsi.dataSetList.size}")
+            sp.append("\nimsi1: mccMnc:${imsi.imsi}； version:${imsi.version}")
     }
 }

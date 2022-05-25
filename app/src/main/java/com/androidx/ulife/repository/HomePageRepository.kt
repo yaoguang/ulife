@@ -45,7 +45,7 @@ object HomePageRepository {
     private fun updatePartInfoCache(part: HomePagePart) {
         when (part.partType) {
             PART_TYPE_USSD -> {
-                val imsiListPart = part.dataPart as? HomeUssdPart ?: return
+                val imsiListPart = part.dataPart as? HomeImsiListPart ?: return
                 imsiListPart.imsi1?.let { carrierCache[it.mccMnc] = it }
                 imsiListPart.imsi2?.let { carrierCache[it.mccMnc] = it }
             }
@@ -64,7 +64,7 @@ object HomePageRepository {
     }
 
     private fun convertUssdLocalData(part: HomePagePart) {
-        val imsiListPart = HomeUssdPart()
+        val imsiListPart = HomeImsiListPart()
         if (SimCardManager.sim1.isValued())
             imsiListPart.imsi1 = convertUssdImsiLocalData(part, SimCardManager.sim1, 1)
         if (SimCardManager.sim2.isValued())
@@ -78,7 +78,7 @@ object HomePageRepository {
         var cachePart = homeUssdDao.queryPart(cardInfo.mcc, cardInfo.mnc)
         // 缓存不存在，使用简单返回值
         if (cachePart == null) {
-            cachePart = HomeCarrierPart(null, cardInfo.mcc, cardInfo.mnc, 0, part.updateTime, HomePagePartForm.NET.ordinal, null)
+            cachePart = HomeCarrierPart(null, part.partType, cardInfo.mcc, cardInfo.mnc, 0, part.updateTime, HomePagePartForm.NET.ordinal, null)
         }
         return cachePart
     }
@@ -184,21 +184,51 @@ object HomePageRepository {
     }
 
     private fun convertUssdResponseData(request: HomePagePartRequest, part: HomePagePart, response: UlifeResp.QueryResponse) {
-        val imsiListPart = HomeUssdPart()
-        val ussdPart = if (response.hasUssdPart()) response.ussdPart else null
+        val imsiListPart = HomeImsiListPart()
         if (request.imsi1 != null)
-            imsiListPart.imsi1 = convertUssdImsiResponseData(request.imsi1!!, response, ussdPart?.imsi1, 1)
+            imsiListPart.imsi1 = convertUssdImsiResponseData(request.imsi1!!, response, 1)
         if (request.imsi2 != null)
-            imsiListPart.imsi2 = convertUssdImsiResponseData(request.imsi2!!, response, ussdPart?.imsi2, 2)
+            imsiListPart.imsi2 = convertUssdImsiResponseData(request.imsi2!!, response, 2)
         part.dataPart = imsiListPart
         part.dataProto = null
         part.dataArray = null
     }
 
-    private fun convertUssdImsiResponseData(request: HomeCarrierPartRequest, response: UlifeResp.QueryResponse, imsi: UlifeResp.ImsiPart?, simIndex: Int): HomeCarrierPart {
+    private fun convertUssdImsiResponseData(
+        request: HomeCarrierPartRequest,
+        response: UlifeResp.QueryResponse,
+        simIndex: Int
+    ): HomeCarrierPart? {
+        return when (response.partType) {
+            PART_TYPE_USSD -> {
+                val imsiPart = if (simIndex == 1) response.ussdPart.imsi1 else response.ussdPart.imsi2
+                convertUssdImsiResponseData(
+                    request, response,
+                    imsiPart, imsiPart?.version, response.updateTime, imsiPart?.toByteArray(),
+                    simIndex
+                )
+            }
+            PART_TYPE_TOP_UP -> {
+                val imsiPart = if (simIndex == 1) response.rechargePart.imsi1 else response.rechargePart.imsi2
+                convertUssdImsiResponseData(
+                    request, response,
+                    imsiPart, imsiPart?.version, response.updateTime, imsiPart?.toByteArray(),
+                    simIndex
+                )
+            }
+            else -> null
+        }
+    }
+
+    private fun convertUssdImsiResponseData(
+        request: HomeCarrierPartRequest,
+        response: UlifeResp.QueryResponse,
+        imsi: Any?, respVersion: Int?, respUpdateTime: Long?, respData: ByteArray?,
+        simIndex: Int
+    ): HomeCarrierPart {
         val part: HomeCarrierPart
         // 当前卡号未返回有效数据,需要读取缓存数据，返回接口使用，更新数据库请求时间
-        if (imsi == null || imsi.dataSetList.isNullOrEmpty()) {
+        if (imsi == null) {
             // 更新数据库请求时间
             request.updateTime = response.updateTime
             homeUssdDao.updateReqPart(request)
@@ -216,7 +246,9 @@ object HomePageRepository {
 
             // 缓存不存在，使用简单返回值
             if (cachePart == null) {
-                cachePart = HomeCarrierPart(request.id, request.mcc, request.mnc, request.version, request.updateTime, HomePagePartForm.NET.ordinal, imsi?.toByteArray()).apply { dataProto = imsi }
+                cachePart = HomeCarrierPart(request.id, response.partType, request.mcc, request.mnc, request.version, request.updateTime, HomePagePartForm.NET.ordinal, respData).apply {
+                    dataProto = imsi
+                }
             }
             part = cachePart
         } else {
@@ -225,10 +257,11 @@ object HomePageRepository {
             // 更新数据库imsi数据内容
             part = HomeCarrierPart(
                 null,
+                response.partType,
                 request.mcc, request.mnc,
-                imsi.version, imsi.updateTime,
+                respVersion!!, respUpdateTime,
                 HomePagePartForm.NET.ordinal,
-                imsi.toByteArray()
+                respData
             )
             part.dataProto = imsi
             homeUssdDao.insert(part)

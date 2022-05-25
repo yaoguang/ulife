@@ -26,8 +26,8 @@ data class HomePagePartRequest(
             updateTime = this@HomePagePartRequest.updateTime
             partType = this@HomePagePartRequest.partType
             if (partType == PART_TYPE_USSD) {
-                this@HomePagePartRequest.imsi1?.toUssdRequest()?.let { imsi1 = it }
-                this@HomePagePartRequest.imsi2?.toUssdRequest()?.let { imsi2 = it }
+                imsi1?.toSimPartRequest()?.let { simPart1 = it }
+                imsi2?.toSimPartRequest()?.let { simPart2 = it }
             }
         }
     }

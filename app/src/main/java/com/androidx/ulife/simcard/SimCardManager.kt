@@ -8,13 +8,16 @@ import com.androidx.ulife.model.SimCardInfo
 import com.androidx.ulife.repository.HomePageRepository
 import com.androidx.ulife.utlis.getActiveSubscriptionInfoList
 import com.androidx.ulife.utlis.observeBroadcast
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
+@Suppress("DEPRECATION")
 object SimCardManager {
     private val NULL_SIM = SimCardInfo(-1, "", 111L, 1, 1)
 
@@ -47,7 +50,9 @@ object SimCardManager {
                                 sim2 = SimCardInfo(it.simSlotIndex, it.iccId, it.cardId.toLong(), it.mcc, it.mnc)
                             }
                         }
-                        HomePageRepository.homePageInfo(arrayListOf(PART_TYPE_USSD)).collect()
+                        HomePageRepository.homePageInfo(arrayListOf(PART_TYPE_USSD)).catch {
+                            LogUtils.e("init_info", "sim request error", it.message)
+                        }.collect()
                     } else {
                         HomePageRepository.clearUssdState()
                     }

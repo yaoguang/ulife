@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.androidx.ulife.model.UlifeReq
-import com.androidx.ulife.model.queryUssdPart
+import com.androidx.ulife.model.querySimPart
 
 data class HomeCarrierPartRequest(
     @PrimaryKey(autoGenerate = true)
@@ -17,12 +17,10 @@ data class HomeCarrierPartRequest(
     @Ignore
     val mccMnc: String = "$mcc-$mnc"
 
-    fun toUssdRequest(): UlifeReq.QueryUssdPart {
-        return queryUssdPart {
+    fun toSimPartRequest(): UlifeReq.QuerySimPart {
+        return querySimPart {
             version = this@HomeCarrierPartRequest.version
             updateTime = this@HomeCarrierPartRequest.updateTime
-            mcc = this@HomeCarrierPartRequest.mcc
-            mnc = this@HomeCarrierPartRequest.mnc
         }
     }
 }
