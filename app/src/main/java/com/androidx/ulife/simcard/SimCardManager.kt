@@ -3,6 +3,7 @@ package com.androidx.ulife.simcard
 import android.content.Context
 import android.content.IntentFilter
 import android.telephony.TelephonyManager
+import com.androidx.ulife.model.PART_TYPE_TOP_UP
 import com.androidx.ulife.model.PART_TYPE_USSD
 import com.androidx.ulife.model.SimCardInfo
 import com.androidx.ulife.repository.HomePageRepository
@@ -50,11 +51,11 @@ object SimCardManager {
                                 sim2 = SimCardInfo(it.simSlotIndex, it.iccId, it.cardId.toLong(), it.mcc, it.mnc)
                             }
                         }
-                        HomePageRepository.homePageInfo(arrayListOf(PART_TYPE_USSD)).catch {
+                        HomePageRepository.homePageInfo(arrayListOf(PART_TYPE_USSD, PART_TYPE_TOP_UP)).catch {
                             LogUtils.e("init_info", "sim request error", it.message)
                         }.collect()
                     } else {
-                        HomePageRepository.clearUssdState()
+                        HomePageRepository.clearImsiState()
                     }
                 }
         }

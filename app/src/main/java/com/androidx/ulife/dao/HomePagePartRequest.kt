@@ -3,6 +3,7 @@ package com.androidx.ulife.dao
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.androidx.ulife.model.PART_TYPE_TOP_UP
 import com.androidx.ulife.model.PART_TYPE_USSD
 import com.androidx.ulife.model.UlifeReq
 import com.androidx.ulife.model.queryPart
@@ -25,7 +26,7 @@ data class HomePagePartRequest(
             version = this@HomePagePartRequest.version
             updateTime = this@HomePagePartRequest.updateTime
             partType = this@HomePagePartRequest.partType
-            if (partType == PART_TYPE_USSD) {
+            if (partType == PART_TYPE_USSD || partType == PART_TYPE_TOP_UP) {
                 imsi1?.toSimPartRequest()?.let { simPart1 = it }
                 imsi2?.toSimPartRequest()?.let { simPart2 = it }
             }

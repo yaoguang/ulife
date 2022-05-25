@@ -24,7 +24,7 @@ data class HomeCarrierPart(
     var dataProto: Any? = null
 
     @Ignore
-    val mccMnc: String = "$mcc-$mnc"
+    val key: String = "$type-$mcc-$mnc"
 
     init {
         if (dataArray != null)

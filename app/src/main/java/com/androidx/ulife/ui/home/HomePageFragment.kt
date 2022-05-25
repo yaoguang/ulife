@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class HomePageFragment : BaseBindingFragment<FragmentHomePageBinding>() {
     private val viewModel by androidViewModels<HomePageViewModel>()
 
-    private val adapter = HomePageAdapter()
     private val partAdapter = HomePagePartAdapter()
 
     @SuppressLint("UnsafeRepeatOnLifecycleDetector")

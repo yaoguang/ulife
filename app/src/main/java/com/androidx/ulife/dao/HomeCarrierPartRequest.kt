@@ -9,13 +9,14 @@ import com.androidx.ulife.model.querySimPart
 data class HomeCarrierPartRequest(
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
+    @ColumnInfo(name = "type") val type: Int,
     @ColumnInfo(name = "mcc") val mcc: Int,
     @ColumnInfo(name = "mnc") val mnc: Int,
     @ColumnInfo(name = "version") var version: Int,
     @ColumnInfo(name = "update_time") var updateTime: Long
 ) {
     @Ignore
-    val mccMnc: String = "$mcc-$mnc"
+    val key: String = "$type-$mcc-$mnc"
 
     fun toSimPartRequest(): UlifeReq.QuerySimPart {
         return querySimPart {
