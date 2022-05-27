@@ -110,6 +110,9 @@ object HomePageRepository {
         }
     }
 
+    /**
+     * 注意：不可以在主线程执行
+     */
     fun homePageInfo(): Flow<HomePagePart> {
         val partRequest = homePageDao.queryPartReqList()
         updateUssdRequest(partRequest)

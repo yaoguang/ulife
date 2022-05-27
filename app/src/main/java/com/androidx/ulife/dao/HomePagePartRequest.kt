@@ -7,6 +7,7 @@ import com.androidx.ulife.model.PART_TYPE_TOP_UP
 import com.androidx.ulife.model.PART_TYPE_USSD
 import com.androidx.ulife.model.UlifeReq
 import com.androidx.ulife.model.queryPart
+import com.androidx.ulife.simcard.SimCardManager
 
 data class HomePagePartRequest(
     @PrimaryKey(autoGenerate = true)
@@ -27,8 +28,8 @@ data class HomePagePartRequest(
             updateTime = this@HomePagePartRequest.updateTime
             partType = this@HomePagePartRequest.partType
             if (partType == PART_TYPE_USSD || partType == PART_TYPE_TOP_UP) {
-                imsi1?.toSimPartRequest()?.let { simPart1 = it }
-                imsi2?.toSimPartRequest()?.let { simPart2 = it }
+                imsi1?.toSimPartRequest(SimCardManager.sim1)?.let { simPart1 = it }
+                imsi2?.toSimPartRequest(SimCardManager.sim1)?.let { simPart2 = it }
             }
         }
     }

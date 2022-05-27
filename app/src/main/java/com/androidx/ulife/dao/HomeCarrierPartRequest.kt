@@ -3,6 +3,7 @@ package com.androidx.ulife.dao
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.androidx.ulife.model.SimCardInfo
 import com.androidx.ulife.model.UlifeReq
 import com.androidx.ulife.model.querySimPart
 
@@ -18,10 +19,11 @@ data class HomeCarrierPartRequest(
     @Ignore
     val key: String = "$type-$mcc-$mnc"
 
-    fun toSimPartRequest(): UlifeReq.QuerySimPart {
+    fun toSimPartRequest(sim: SimCardInfo): UlifeReq.QuerySimPart {
         return querySimPart {
             version = this@HomeCarrierPartRequest.version
             updateTime = this@HomeCarrierPartRequest.updateTime
+            imsi = sim.imsi.toString()
         }
     }
 }

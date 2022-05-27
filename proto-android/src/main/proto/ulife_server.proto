@@ -6,6 +6,7 @@ import "ulife_resp.proto";
 
 //指定proto文件生成java文件后的类名
 option java_outer_classname = "UlifeServer";
+option java_package = "com.androidx.ulife.server";
 
 //开启多文件
 option java_multiple_files = true;

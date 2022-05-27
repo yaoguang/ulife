@@ -6,6 +6,7 @@ import android.telephony.TelephonyManager
 import com.androidx.ulife.model.PART_TYPE_TOP_UP
 import com.androidx.ulife.model.PART_TYPE_USSD
 import com.androidx.ulife.model.SimCardInfo
+import com.androidx.ulife.net.GrpcApi
 import com.androidx.ulife.repository.HomePageRepository
 import com.androidx.ulife.utlis.getActiveSubscriptionInfoList
 import com.androidx.ulife.utlis.observeBroadcast
@@ -30,6 +31,13 @@ object SimCardManager {
     init {
         sim1 = NULL_SIM
         sim2 = NULL_SIM
+        getActiveSubscriptionInfoList().forEach {
+            if (it.simSlotIndex == 0) {
+                sim1 = SimCardInfo(it.simSlotIndex, it.iccId, it.simSlotIndex.toLong(), it.mcc, it.mnc)
+            } else if (it.simSlotIndex == 1) {
+                sim2 = SimCardInfo(it.simSlotIndex, it.iccId, it.simSlotIndex.toLong(), it.mcc, it.mnc)
+            }
+        }
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
@@ -43,14 +51,14 @@ object SimCardManager {
                     if (isReadySimState()) {
                         sim1 = NULL_SIM
                         sim2 = NULL_SIM
-                        val list = getActiveSubscriptionInfoList()
-                        list.forEach {
+                        getActiveSubscriptionInfoList().forEach {
                             if (it.simSlotIndex == 0) {
-                                sim1 = SimCardInfo(it.simSlotIndex, it.iccId, it.cardId.toLong(), it.mcc, it.mnc)
+                                sim1 = SimCardInfo(it.simSlotIndex, it.iccId, it.simSlotIndex.toLong(), it.mcc, it.mnc)
                             } else if (it.simSlotIndex == 1) {
-                                sim2 = SimCardInfo(it.simSlotIndex, it.iccId, it.cardId.toLong(), it.mcc, it.mnc)
+                                sim2 = SimCardInfo(it.simSlotIndex, it.iccId, it.simSlotIndex.toLong(), it.mcc, it.mnc)
                             }
                         }
+                        GrpcApi.refreshGeneralParamsSmi()
                         HomePageRepository.homePageInfo(arrayListOf(PART_TYPE_USSD, PART_TYPE_TOP_UP)).catch {
                             LogUtils.e("init_info", "sim request error", it.message)
                         }.collect()

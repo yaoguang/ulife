@@ -17,11 +17,10 @@ message PinnedItem{
 }
 
 message PinnedPart{
-  int32 partType = 1;
-  int32 version = 2;
-  bool ignoreMcc = 3;
-  repeated PinnedItem dataSet = 4;
-  string ext = 5;
+  int32 version = 1;
+  bool ignoreMcc = 2;
+  repeated PinnedItem dataSet = 3;
+  string ext = 4;
 }
 /*********金刚位 end*************/
 
@@ -34,11 +33,10 @@ message AdTxtItem{
 }
 
 message AdTxtPart{
-  int32 partType = 1;
-  int32 version = 2;
-  bool ignoreMcc = 3;
-  repeated AdTxtItem dataSet = 4;
-  string ext = 5;
+  int32 version = 1;
+  bool ignoreMcc = 2;
+  repeated AdTxtItem dataSet = 3;
+  string ext = 4;
 }
 /*********文本广告位 end***********/
 
@@ -49,11 +47,10 @@ message AdPicItem{
 }
 
 message AdPicPart{
-  int32 partType = 1;
-  int32 version = 2;
-  bool ignoreMcc = 3;
-  repeated AdPicItem dataSet = 4;
-  string ext = 5;
+  int32 version = 1;
+  bool ignoreMcc = 2;
+  repeated AdPicItem dataSet = 3;
+  string ext = 4;
 }
 /*********图文广告位 end***********/
 
@@ -64,11 +61,10 @@ message AdFloatingItem{
 }
 
 message AdFloatingPart{
-  int32 partType = 1;
-  int32 version = 2;
-  bool ignoreMcc = 3;
-  repeated AdFloatingItem dataSet = 4;
-  string ext = 5;
+  int32 version = 1;
+  bool ignoreMcc = 2;
+  repeated AdFloatingItem dataSet = 3;
+  string ext = 4;
 }
 /*********悬浮广告 end***********/
 
@@ -89,11 +85,10 @@ message RechargeItem{
 }
 
 message ImsiRechargePart{
-  int32 partType = 1;
-  int32 version = 2;
-  string imsi = 3;
-  repeated RechargeItem dataSet = 4;
-  string ext = 5;
+  int32 version = 1;
+  string imsi = 2;
+  repeated RechargeItem dataSet = 3;
+  string ext = 4;
 }
 
 message RechargePart{
@@ -111,11 +106,10 @@ message UssdItem{
 }
 
 message ImsiUssdPart{
-  int32 partType = 1;
-  int32 version = 2;
-  string imsi = 3;
-  repeated UssdItem dataSet = 4;
-  string ext = 5;
+  int32 version = 1;
+  string imsi = 2;
+  repeated UssdItem dataSet = 3;
+  string ext = 4;
 }
 
 message UssdPart{
